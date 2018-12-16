@@ -10,7 +10,7 @@ pyBank_path = '/Users/timhulak/Desktop/USC_Viterbi/homework/python/python-challe
 #Vars and Lists to store data
 counter = 0
 months = []
-prev = 867884
+prev = 867884 #value in first cell
 changes = []
 
 with open(pyBank_path, newline='', encoding='utf8') as csvfile:
