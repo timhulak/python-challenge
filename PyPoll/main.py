@@ -50,15 +50,17 @@ with open(pyPoll_path) as csvfile:
 
 
     #The winner of the election based on popular vote.
+    results = {'khan': khan, 'correy': correy, 'li': li, 'otooley': otooley}
+    winner = max(results, key=results.get)
 
     print('Election Results:')
     print('---------------------')
     print(f'Total Votes: {total_votes}')
     print('---------------------')
-    print(f'Khan: {khan_percent} ({khan})')
-    print(f'Correy: {correy_percent}({correy})')
-    print(f'Li:  {li_percent}({li})')
-    print(f'O\'Tooley: {otooley_percent}({otooley})')
-    #print('---------------------')
-    #print(f'Winner: {winner}')
-    #print('---------------------')
+    print(f'Khan: {khan_percent}% ({khan})')
+    print(f'Correy: {correy_percent}% ({correy})')
+    print(f'Li:  {li_percent}% ({li})')
+    print(f'O\'Tooley: {otooley_percent}% ({otooley})')
+    print('---------------------')
+    print(f'Winner: {winner}')
+    print('---------------------')
