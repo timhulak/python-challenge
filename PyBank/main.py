@@ -1,43 +1,72 @@
-#import Dependencies/Modules
-import os
+# -*- coding: UTF-8 -*-
+
+# Dependencies
 import csv
-import numpy as np
+import os
 
-#encoding path
-from pathlib import Path
-pyBank_path = '/Users/timhulak/Desktop/USC_Viterbi/homework/python/python-challenge/PyBank/resources/pyBank.csv'
+# Files to load and output (Remember to change these)
+file_to_load = os.path.join("resources", "pyBank.csv")
+file_to_output = os.path.join("analysis", "budget_analysis.txt")
 
-#Vars and Lists to store data
-counter = 0
-months = []
-prev = 867884 #value in first cell
-changes = []
+# Track various financial parameters
+total_months = 0
+month_of_change = []
+net_change_list = []
+greatest_increase = ["", 0]
+greatest_decrease = ["", 9999999999999999999]
+total_net = 0
 
-with open(pyBank_path, newline='', encoding='utf8') as csvfile:
-    csvreader = csv.reader(csvfile, delimiter=',')
-    csv_header = next(csvreader)
-    for row in csvreader:
-    #The total number of months included in the dataset
-        months.append(int(row[1]))
-        change = int(row[1]) - prev
-        changes.append(change)
-        prev = int(row[1])
-    #The total net amount of "Profit/Losses" over the entire period
-    total_net = sum(months)
+# Read the csv and convert it into a list of dictionaries
+with open(file_to_load) as financial_data:
+    reader = csv.reader(financial_data)
 
-    #The average change in "Profit/Losses" between months over the entire period
-    average = round(sum(changes)/len(changes),2)
+    # Read the header row
+    header = next(reader)
 
-    #The greatest increase in profits (date and amount) over the entire period
-    greatest_increase = max(changes)
+    # Extract first row to avoid appending to net_change_list
+    first_row = next(reader)
+    total_months = total_months + 1
+    total_net = total_net + int(first_row[1])
+    prev_net = int(first_row[1])
 
-    #The greatest decrease in losses (date and amount) over the entire period
-    greatest_decrease = min(changes)
+    for row in reader:
 
-    print('Financial Analysis')
-    print('---------------------')
-    print(f'Total Months: {len(months)}')
-    print(f'Total Net: {total_net}')
-    print(f'Average Change: {average}')
-    print(f'Greatest Increase: Feb-12 {greatest_increase}')
-    print(f'Greatest Decrease: Sep-13 {greatest_decrease}')
+        # Track the total
+        total_months = total_months + 1
+        total_net = total_net + int(row[1])
+
+        # Track the net change
+        net_change = int(row[1]) - prev_net
+        prev_net = int(row[1])
+        net_change_list = net_change_list + [net_change]
+        month_of_change = month_of_change + [row[0]]
+
+        # Calculate the greatest increase
+        if net_change > greatest_increase[1]:
+            greatest_increase[0] = row[0]
+            greatest_increase[1] = net_change
+
+        # Calculate the greatest decrease
+        if net_change < greatest_decrease[1]:
+            greatest_decrease[0] = row[0]
+            greatest_decrease[1] = net_change
+
+# Calculate the Average Net Change
+net_monthly_avg = sum(net_change_list) / len(net_change_list)
+
+# Generate Output Summary
+output = (
+    f"\nFinancial Analysis\n"
+    f"----------------------------\n"
+    f"Total Months: {total_months}\n"
+    f"Total: ${total_net}\n"
+    f"Average  Change: ${net_monthly_avg:.2f}\n"
+    f"Greatest Increase in Profits: {greatest_increase[0]} (${greatest_increase[1]})\n"
+    f"Greatest Decrease in Profits: {greatest_decrease[0]} (${greatest_decrease[1]})\n")
+
+# Print the output (to terminal)
+print(output)
+
+# Export the results to text file
+with open(file_to_output, "w") as txt_file:
+    txt_file.write(output)
